@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Display from './components/Display';
 import styled from 'styled-components';
 import Button from './components/Button';
@@ -14,10 +14,10 @@ const App: React.FC = () => {
 	const [date, setDate] = useState<string>('');
 
 	useEffect(() => {
-		getCurrentDate();
+		setCurrentDate();
 	}, []);
 
-	const getCurrentDate = () => {
+	const getCurrentDate = useCallback(() => {
 		const currentDate = new Date();
 		const [seconds, minutes, hours, day, month, year] = [
 			currentDate.getSeconds().toString().padStart(2, '0'),
@@ -27,13 +27,17 @@ const App: React.FC = () => {
 			currentDate.getMonth() + 1,
 			currentDate.getFullYear(),
 		];
-		setDate(`${hours}:${minutes}:${seconds} ${day}/${month}/${year}`);
-	};
+		return `${hours}:${minutes}:${seconds} ${day}/${month}/${year}`;
+	}, []);
+
+	const setCurrentDate = useCallback(() => {
+		setDate(getCurrentDate());
+	}, []);
 
 	return (
 		<Wrapper>
 			<Display date={date} />
-			<Button refresh={getCurrentDate} />
+			<Button refresh={setCurrentDate} />
 		</Wrapper>
 	);
 };
